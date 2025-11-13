@@ -14,42 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace filter_easychem;
+
+use moodle_url;
+
 /**
- * Filter converting URLs in the text to HTML links
+ * Filter converting [%  %] to easychem chemical structures and formulas
  *
- * @package    filter
- * @subpackage easychem
- * @copyright  2014 onwards Carl LeBlond
+ * @package    filter_easychem
+ * @copyright  2014 Carl LeBlond, 2025 Andrey Smirnov
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-class filter_easychem extends moodle_text_filter {
+class text_filter extends \core_filters\text_filter {
 
     protected static $globalconfig;
-    /**
-     * Apply the filter to the text
-     *
-     * @see filter_manager::apply_filter_chain()
-     * @param string $text to be processed by the text
-     * @param array $options filter options
-     * @return string text after processing
-     */
-    public function filter($text, array $options = array()) {
+
+    #[\Override]
+    public function filter($text, array $options = []) {
         global $CFG, $PAGE, $easychemconfigured;
         $search = "(\[\%(.*?)\\%])is";
         $newtext = preg_replace_callback($search, array($this, 'callback'), $text);
         if (($newtext != $text) && !isset($easychemconfigured)) {
             $easychemconfigured = true;
-            $url = $CFG->wwwroot . '/filter/easychem/js/easychem.js';
-            $url = new moodle_url($url);
-            $moduleconfig = array(
-                'name' => 'easychem',
-                'fullpath' => $url
-            );
-            $PAGE->requires->js_module($moduleconfig);
-            $PAGE->requires->yui_module('moodle-filter_easychem-loader', 'M.filter_easychem.typeset');
+            $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/filter/easychem/js/easychem.js'));
+            $PAGE->requires->js_call_amd('filter_easychem/loader', 'typeset');
         }
         return $newtext;
     }
