@@ -39,7 +39,8 @@ class text_filter extends \core_filters\text_filter {
         $newtext = preg_replace_callback($search, array($this, 'callback'), $text);
         if (($newtext != $text) && !isset($easychemconfigured)) {
             $easychemconfigured = true;
-            $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/filter/easychem/js/easychem.js'));
+            $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/filter/easychem/js/charchem2.js'));
+            $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/filter/easychem/js/easychem-lang.js'));
             $PAGE->requires->js_call_amd('filter_easychem/loader', 'typeset');
         }
         return $newtext;
